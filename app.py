@@ -48,13 +48,13 @@ INFER_EVERY = 0.35   # detik: jeda minimal antar deteksi YOLO pada kamera terpil
 #  - Kamera yang tidak diisi / path-nya salah akan tampil "offline".
 # =====================================================================
 CAMERA_CONFIG = {
-    1: {"label": "Jalan Utama", "banjar": "[Nama banjar]",
+    1: {"label": "Jalan Utama", "banjar": "Banjar Dinas Delod Rurung",
         "videos": ["CCTV_1_Jalan_Utama"]},
-    2: {"label": "Taman dan Ruang Terbuka", "banjar": "[Nama banjar]",
+    2: {"label": "Taman dan Ruang Terbuka", "banjar": "Banjar Dinas Gerokgak Gede",
         "videos": ["CCTV_2_Taman_dan_Ruang_Hijau"]},   # <- lengkapi nama foldernya
-    3: {"label": "Titik 3", "banjar": "[Nama banjar]",
+    3: {"label": "Kantor Desa", "banjar": "Banjar Dinas Gerokgak Tengah",
         "videos": ["PERLU_VERIFIKASI_Tidak_Sesuai_Kategori"]},                              # tidak ada folder = offline
-    4: {"label": "Tempat Sampah", "banjar": "[Nama banjar]",
+    4: {"label": "Tempat Sampah", "banjar": "Banjar Dinas Sakenan Blodan",
         "videos": ["CCTV_4_Tempat_Sampah"]},
 }
 CAPTURE_DIR = BASE / "data" / "captures"
