@@ -72,6 +72,46 @@ CATS = {  # kategori: (latar, teks, titik/bar)
     "Perlu Dibersihkan": ("#fde7c2", "#7a4a00", "#e0a21c"),
     "Sangat Perlu Dibersihkan": ("#f8d3c5", "#8a2a0a", "#c4410c"),
 }
+# Ambang kategori: jumlah objek sampah terlihat per foto (sesuai tabel laporan).
+#   0 -> Bersih | 1-3 -> Cukup Bersih | 4-9 -> Perlu Dibersihkan | >=10 -> Sangat Perlu Dibersihkan
+CATEGORY_RULES = ((0, "Bersih"), (3, "Cukup Bersih"), (9, "Perlu Dibersihkan"))
+CATEGORY_TOP = "Sangat Perlu Dibersihkan"
+
+
+def categorize(n: int, th=None) -> str:
+    """Kategori kebersihan dari jumlah objek per foto. Parameter `th` diabaikan
+    (dipertahankan agar pemanggilan lama tetap jalan)."""
+    for upper, name in CATEGORY_RULES:
+        if n <= upper:
+            return name
+    return CATEGORY_TOP
+
+
+# Data lama di database menyimpan kategori dari ambang lama. Supaya semua tampilan selalu
+# konsisten dengan tabel ambang di atas, kategori dihitung ulang dari jumlah objek (`total`).
+def _recat(df):
+    if df is not None and len(df) and "total" in df.columns:
+        df = df.copy()
+        df["category"] = df["total"].astype(int).map(categorize)
+    return df
+
+
+def _latest_per_camera():
+    return _recat(db.latest_per_camera())
+
+
+def _get_analyses(*args, **kwargs):
+    return _recat(db.get_analyses(*args, **kwargs))
+
+
+def _get_analysis(analysis_id):
+    r = db.get_analysis(analysis_id)
+    if r is not None and r.get("total") is not None:
+        r = dict(r)
+        r["category"] = categorize(int(r["total"]))
+    return r
+
+
 INTERVALS = {"30 detik": 30, "1 menit": 60, "5 menit": 300, "10 menit": 600,
              "30 menit": 1800, "Manual saja": None}
 MONTHS = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"]
@@ -372,8 +412,8 @@ def render_topbar() -> None:
 # ============================================================== Dashboard
 def page_dashboard(cams) -> None:
     cmap = {c.no: c for c in cams}
-    latest = db.latest_per_camera()
-    last = db.get_analyses(limit=1)
+    latest = _latest_per_camera()
+    last = _get_analyses(limit=1)
     stamp = (f"Pemeriksaan terakhir {fdate(last.iloc[0]['captured_at'], True)}"
              if not last.empty else "Belum ada pemeriksaan")
     head("Kondisi kebersihan desa", "Ringkasan pemeriksaan terakhir di setiap titik yang dipantau.",
@@ -450,7 +490,7 @@ def page_history(cams) -> None:
     c1, c2 = st.columns([1, 2.3], gap="small", vertical_alignment="bottom")
     cam_no = c1.selectbox("Lokasi", nos, key="hist_cam",
                           format_func=lambda n: f"{cmap[n].label} · {cmap[n].banjar}")
-    df = db.get_analyses(camera_no=cam_no)
+    df = _get_analyses(camera_no=cam_no)
     if df.empty:
         st.markdown(H('<div class="card"><h3>Belum ada pemeriksaan</h3><p>Lokasi ini belum punya riwayat. '
                       'Buka <b>Pantau CCTV</b> agar gambar diambil dan dianalisis.</p></div>'),
@@ -507,7 +547,7 @@ def more_rows() -> None:
 
 @st.dialog("Detail pemeriksaan", width="large")
 def show_detail(analysis_id: int) -> None:
-    r = db.get_analysis(analysis_id)
+    r = _get_analysis(analysis_id)
     if r is None:
         st.warning("Data tidak ditemukan.")
         return
@@ -562,7 +602,7 @@ def save_capture(cam, player_name: str, frame_idx: int, frame_s, dets, det, th, 
     cv2.imwrite(str(photo), drawn, [cv2.IMWRITE_JPEG_QUALITY, 85])
     cv2.imwrite(str(thumb), shrink(drawn, 160), [cv2.IMWRITE_JPEG_QUALITY, 80])
     counts = dict(Counter(pretty(d.class_name) for d in dets))
-    cat = db.categorize(len(dets), th)
+    cat = categorize(len(dets), th)
     db.add_analysis(camera_no=cam.no, camera_label=cam.label, captured_at=now,
                     source_video=player_name, frame_idx=frame_idx,
                     photo_path=photo.relative_to(BASE).as_posix(),
@@ -589,7 +629,7 @@ def page_cctv(cams, det: WasteDetector) -> None:
          f'<span class="pill-online"><i></i>{len(online)} dari {len(cams)} kamera online</span>',
          extra_css=f"<style>.st-key-cam_{sel_cam.no}{{border-color:#2d6a4f !important;}}</style>")
 
-    latest = {int(r.camera_no): r for r in db.latest_per_camera().itertuples()}
+    latest = {int(r.camera_no): r for r in _latest_per_camera().itertuples()}
     latest_cat = {no: r.category for no, r in latest.items()}
 
     # ---- 4 kartu kamera
@@ -698,7 +738,7 @@ def page_cctv(cams, det: WasteDetector) -> None:
                                          f"{p.name} · {fdate(now_dt, True)} · {now_dt:%H:%M}"),
                          channels="BGR", output_format="JPEG", width="stretch")
             if have_dets:
-                cat = db.categorize(int(np.median(smooth)), th)
+                cat = categorize(int(np.median(smooth)), th)
                 for key, ph, content in (("c", cond_ph, cond_html(cat, len(cur_dets))),
                                          ("t", types_ph, types_html(Counter(pretty(d.class_name)
                                                                             for d in cur_dets)))):
@@ -750,7 +790,7 @@ def save_th() -> None:
 
 # ================================================================== main
 st.markdown(CSS, unsafe_allow_html=True)
-st.session_state.setdefault("page", "Pantau CCTV")
+st.session_state.setdefault("page", "Dashboard")
 
 cams = build_cameras(CAMERA_CONFIG, BASE)
 model_file = find_model(BASE)
