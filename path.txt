@@ -1,0 +1,10 @@
+CAMERA_CONFIG = {
+    1: {"label": "Jalan Utama", "banjar": "[Nama banjar]",
+        "videos": ["CCTV_1_Jalan_Utama"]},
+    2: {"label": "Taman dan Ruang Terbuka", "banjar": "[Nama banjar]",
+        "videos": ["CCTV_2_Taman_dan_Ruang_Hijau"]},   # <- lengkapi nama foldernya
+    3: {"label": "Titik 3", "banjar": "[Nama banjar]",
+        "videos": ["PERLU_VERIFIKASI_Tidak_Sesuai_Kategori"]},                              # tidak ada folder = offline
+    4: {"label": "Tempat Sampah", "banjar": "[Nama banjar]",
+        "videos": ["CCTV_4_Tempat_Sampah"]},
+}

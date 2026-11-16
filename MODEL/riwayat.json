@@ -1,0 +1,48 @@
+[
+  {
+    "id": 1,
+    "lokasi": "Taman",
+    "banjar": "Banjar Contoh",
+    "kamera": "CCTV 1",
+    "waktu": "2026-11-15 07:53",
+    "jumlah_sampah": 9,
+    "per_jenis": {
+      "Botol plastik": 0,
+      "Kantong plastik": 9,
+      "Kaleng": 0,
+      "Kardus": 0
+    },
+    "jenis_teks": "Kantong plastik",
+    "status": {
+      "kode": "cukup_bersih",
+      "label": "Cukup Bersih",
+      "prioritas": "Rendah",
+      "warna_hex": "#8DA52E",
+      "keterangan": "Lokasi cukup bersih. Ada 9 sampah, masih aman tetapi perlu dipantau."
+    },
+    "thumbnail": "/content/dashboard_data/thumb/pemeriksaan_1.jpg"
+  },
+  {
+    "id": 2,
+    "lokasi": "Taman",
+    "banjar": "Banjar Contoh",
+    "kamera": "CCTV 1",
+    "waktu": "2026-11-15 07:56",
+    "jumlah_sampah": 0,
+    "per_jenis": {
+      "Botol plastik": 0,
+      "Kantong plastik": 0,
+      "Kaleng": 0,
+      "Kardus": 0
+    },
+    "jenis_teks": "-",
+    "status": {
+      "kode": "bersih",
+      "label": "Bersih",
+      "prioritas": "Rendah",
+      "warna_hex": "#1F7A5C",
+      "keterangan": "Lokasi bersih. Hanya 0 sampah terdeteksi."
+    },
+    "thumbnail": "/content/dashboard_data/thumb/pemeriksaan_2.jpg"
+  }
+]

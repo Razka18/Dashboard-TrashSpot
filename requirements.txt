@@ -1,0 +1,5 @@
+streamlit>=1.50
+ultralytics>=8.4.0   # perlu versi terbaru agar mendukung YOLO26
+opencv-python-headless
+pandas>=2.2
+numpy

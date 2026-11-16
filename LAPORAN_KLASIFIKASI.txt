@@ -1,0 +1,16 @@
+LAPORAN PENGELOMPOKAN CCTV
+========================================
+File sumber di Drive: 400
+Jumlah file dalam kategori: 400
+
+CCTV_1_Jalan_Utama: 274
+CCTV_2_Taman_dan_Ruang_Hijau: 14
+CCTV_3_Sungai: 0
+CCTV_4_Tempat_Sampah: 76
+PERLU_VERIFIKASI_Tidak_Sesuai_Kategori: 36
+
+File dilewati: 0
+File gagal diunduh: 0
+
+Catatan: kategori berasal dari CSV.
+File yang tidak cocok masuk PERLU_VERIFIKASI.
